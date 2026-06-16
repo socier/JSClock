@@ -70,7 +70,7 @@
   <div id="settings-modal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>JS Clock <span class="version-tag" id="settings-version-header">v0.2.15</span></h2>
+        <h2><span id="about-trigger" style="cursor:pointer;">JS Clock</span> <span class="version-tag" id="settings-version-header">v0.2.16</span></h2>
         <button id="settings-close-btn" aria-label="Close settings">Done</button>
       </div>
       
@@ -145,6 +145,28 @@
 
   <!-- 화면 꺼짐 방지용 보이지 않는 더미 비디오 -->
   <video id="dummy-video" playsinline muted loop style="position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; top: -10px; left: -10px;"></video>
+
+  <!-- About 팝업창 -->
+  <div id="about-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>About JS Clock</h2>
+        <button id="about-close-btn" aria-label="Close about">Done</button>
+      </div>
+      <div class="about-text" style="color: rgba(255, 255, 255, 0.85); font-size: 14px; line-height: 1.6; margin-top: 15px;">
+        <p>A minimalist PWA digital clock optimized for repurposing old smartphones and tablets.</p>
+        <h3 style="color: #fff; margin: 20px 0 10px; font-size: 16px;">🎯 Core Feature: Intuitive Dimming</h3>
+        <p>When used as a nightstand clock, even the faintest light can disrupt your sleep. With JS Clock, simply <strong>swipe up or down anywhere on the screen</strong> to instantly adjust the brightness. No need to fiddle with physical buttons or drop down the status bar.</p>
+        <h3 style="color: #fff; margin: 20px 0 10px; font-size: 16px;">✨ Key Features</h3>
+        <ul style="padding-left: 20px; margin-bottom: 20px;">
+          <li style="margin-bottom: 8px;"><strong>Offline Support:</strong> Works perfectly without an internet connection once installed.</li>
+          <li style="margin-bottom: 8px;"><strong>Wake Lock:</strong> Prevents the screen from turning off automatically while the clock is running.</li>
+          <li style="margin-bottom: 8px;"><strong>Ad-Free & Lightweight:</strong> Designed with only essential features for your undisturbed sleep and focused time.</li>
+        </ul>
+        <p style="text-align: center; margin-top: 30px; font-size: 12px; color: rgba(255,255,255,0.5);">Developed by socier</p>
+      </div>
+    </div>
+  </div>
 
   <!-- PWA 서비스 워커 등록 및 시계 구동 스크립트 -->
   <script src="app.js"></script>
