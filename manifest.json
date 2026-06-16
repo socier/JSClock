@@ -1,0 +1,22 @@
+{
+  "name": "JS Clock",
+  "short_name": "JS Clock",
+  "description": "구형 기기에서도 완벽하게 구동되는 시인성 높은 PWA 디지털 시계",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

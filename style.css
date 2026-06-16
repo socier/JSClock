@@ -1,0 +1,451 @@
+/* CSS 초기화 및 기본 설정 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #000000;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 시계 컨테이너 레이아웃 */
+#clock-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  text-align: center;
+  z-index: 10;
+}
+
+/* 시간 표시 스타일 */
+#time-display {
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 500;
+  line-height: 1.1;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums; /* 숫자 폭을 고정하여 매 초 움직일 때 떨림 현상 방지 */
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.15), 0 0 10px rgba(0, 229, 255, 0.1);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+
+/* 날짜 표시 스타일 */
+#date-display {
+  font-weight: 300;
+  color: #888888;
+  letter-spacing: 0.05em;
+  margin-top: 15px;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* 하단 상태 표시줄 */
+#status-bar {
+  position: absolute;
+  bottom: 25px;
+  display: flex;
+  gap: 20px;
+  font-size: 13px;
+  color: #444444;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  transition: opacity 0.5s ease;
+}
+
+#status-bar.hidden {
+  opacity: 0.02; /* 어두운 방에서 눈이 부시지 않도록 평소에는 희미하게 처리 */
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+  display: inline-block;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.status-dot.active {
+  background-color: #00e5ff; /* 네온 블루 글로우 효과 */
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.6);
+}
+
+.status-dot.inactive {
+  background-color: #444444;
+}
+
+.status-dot.warning {
+  background-color: #ff9100;
+  box-shadow: 0 0 8px rgba(255, 145, 0, 0.6);
+}
+
+/* 물리적인 화면 밝기 어둡기용 블랙 오버레이 */
+#brightness-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000000;
+  z-index: 9999;
+  pointer-events: none; /* 클릭 이벤트가 시계 레이어까지 통과하게 함 */
+  opacity: 0; /* 기본 밝기는 투명 (100% 밝기) */
+  transition: opacity 0.05s ease-out; /* 제스처 드래그 시 딜레이 없는 즉각적인 피드백 */
+}
+
+/* 세로형 밝기 조절 표시기 슬라이더 (아이폰 스타일 그레이/화이트) */
+#brightness-indicator-container {
+  position: fixed;
+  right: 25px;
+  top: 50%;
+  transform: translateY(-50%) scale(0.9);
+  z-index: 10000;
+  width: 54px;
+  height: 280px;
+  background: rgba(18, 18, 18, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 6px;
+  opacity: 0; /* 평상시에는 숨김 */
+  pointer-events: none;
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#brightness-indicator-container.visible {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+/* 밝기 아이콘 (상단 배치) */
+#brightness-icon {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  margin-bottom: 6px;
+}
+
+#brightness-icon svg {
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+}
+
+/* 슬라이더 바 트랙 (반투명 그레이) */
+#brightness-bar-track {
+  width: 16px;
+  height: 180px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  margin: 5px 0;
+}
+
+/* 슬라이더 바 채우기 영역 (순수 흰색) */
+#brightness-bar-fill {
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  border-radius: 8px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform-origin: bottom;
+  transform: scaleY(1.0); /* 초기는 100% */
+  transition: transform 0.05s ease-out;
+}
+
+/* 밝기 퍼센트 텍스트 */
+#brightness-percentage {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin-top: 5px;
+}
+
+/* 설정 팝업 모달 스타일 (iOS/Android 네이티브 다크 테마) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 20000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: #000000; /* iOS 다크 모드 블랙 배경 */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  width: 90%;
+  max-width: 440px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  transform: scale(0.95);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.modal-overlay.visible .modal-content {
+  transform: scale(1);
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 3px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.modal-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+}
+
+.modal-header h2 .version-tag {
+  font-size: 14px;
+  font-weight: 400;
+  color: #8e8e93; /* iOS 시스템 회색 */
+  margin-left: 8px;
+}
+
+#settings-close-btn {
+  background: #1c1c1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #0a84ff; /* iOS 시스템 블루 */
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 18px;
+  border-radius: 18px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+#settings-close-btn:active {
+  background: #2c2c2e;
+  transform: scale(0.97);
+}
+
+/* 설정 그룹 카드 디자인 */
+.setting-group-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #8e8e93; /* iOS dark grey title color */
+  margin: 18px 0 8px 8px;
+  letter-spacing: 0.05em;
+}
+
+.setting-group-card {
+  background: #1c1c1e; /* iOS list background color */
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.setting-row:last-child {
+  border-bottom: none;
+}
+
+/* iOS 네이티브 스타일 토글 스위치 */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 51px;
+  height: 31px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #39393d; /* iOS off state */
+  transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 31px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 27px;
+  width: 27px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+input:checked + .slider {
+  background-color: #0a84ff; /* iOS/안드로이드 통합 시스템 블루 */
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* 폰트 크기 슬라이더 레이아웃 */
+.font-size-control {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.font-size-label-row {
+  display: flex;
+  justify-content: space-between;
+  color: #ffffff;
+  font-size: 15px;
+}
+
+#font-size-val {
+  font-weight: 600;
+  color: #0a84ff;
+}
+
+/* 범위 슬라이더 스타일 */
+.setting-group-card input[type="range"] {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 6px 0;
+}
+
+.setting-group-card input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.1s ease;
+}
+
+.setting-group-card input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(1.15);
+}
+
+.setting-group-card input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.setting-version-footer {
+  text-align: center;
+  font-size: 12px;
+  color: #555555;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  letter-spacing: 0.02em;
+}
+
+/* 시간 구분 콜론 깜빡임 효과용 클래스 */
+.colon {
+  transition: opacity 0.15s ease;
+  opacity: 1;
+}
+
+.colon.hidden {
+  opacity: 0.05; /* 어두운 방에서 눈이 피로하지 않도록 5% 투명하게 흐릿하게 표현 */
+}

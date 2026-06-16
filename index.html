@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>JS Clock</title>
+  
+  <!-- PWA 및 모바일 뷰포트 설정 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- iOS 사파리 전용 메타 태그 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JS Clock">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  
+  <!-- PWA 매니페스트 연결 -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+
+  <!-- 가독성 높은 모던 폰트 가져오기 (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 시계 화면 컨테이너 -->
+  <main id="clock-container">
+    <div id="time-display">00:00:00</div>
+    <div id="date-display">2026.06.16 TUE</div>
+    
+    <!-- 하단 상태 표시줄: 화면 유지 상태, 오프라인 여부, 버전 정보 -->
+    <div id="status-bar">
+      <span id="wakelock-status" class="status-item" style="display: none;">
+        <span class="status-dot inactive" id="wakelock-dot"></span>
+        <span class="status-text" id="wakelock-text">화면 유지 비활성</span>
+      </span>
+      <span id="offline-status" class="status-item" style="display: none;">
+        <span class="status-dot warning"></span>
+        <span class="status-text">오프라인 모드</span>
+      </span>
+    </div>
+  </main>
+
+  <!-- 제스처 밝기 조절 표시기 -->
+  <div id="brightness-indicator-container">
+    <div id="brightness-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+    </div>
+    <div id="brightness-bar-track">
+      <div id="brightness-bar-fill"></div>
+    </div>
+    <div id="brightness-percentage">100%</div>
+  </div>
+
+  <!-- 설정 팝업창 (iOS/Android 네이티브 스타일) -->
+  <div id="settings-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>JS Clock <span class="version-tag" id="settings-version-header">v0.2.6</span></h2>
+        <button id="settings-close-btn" aria-label="Close settings">Done</button>
+      </div>
+      
+      <div class="setting-group-title">Display Options</div>
+      <div class="setting-group-card">
+        <div class="setting-row">
+          <span>Show Date</span>
+          <label class="switch">
+            <input type="checkbox" id="setting-show-date" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <span>Show Seconds</span>
+          <label class="switch">
+            <input type="checkbox" id="setting-show-seconds" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <span>24-Hour Format</span>
+          <label class="switch">
+            <input type="checkbox" id="setting-use-24hour" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <span>Leading Zero</span>
+          <label class="switch">
+            <input type="checkbox" id="setting-leading-zero" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <span>Blink Colon</span>
+          <label class="switch">
+            <input type="checkbox" id="setting-blink-colon" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <span>Space Around Colons</span>
+          <label class="switch">
+            <input type="checkbox" id="setting-space-colons">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <span>Bold Text</span>
+          <label class="switch">
+            <input type="checkbox" id="setting-bold-text">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="setting-group-title">Sizing</div>
+      <div class="setting-group-card">
+        <div class="setting-row font-size-control">
+          <div class="font-size-label-row">
+            <span>Font Size</span>
+            <span id="font-size-val">100%</span>
+          </div>
+          <input type="range" id="setting-font-size" min="70" max="150" value="100" step="5">
+        </div>
+      </div>
+      
+      <div class="setting-version-footer" id="settings-version-footer">
+        JS Clock v0.2.6
+      </div>
+    </div>
+  </div>
+
+  <!-- 화면을 어둡게 덮어주는 블랙 오버레이 레이어 -->
+  <div id="brightness-overlay"></div>
+
+  <!-- 화면 꺼짐 방지용 보이지 않는 더미 비디오 -->
+  <video id="dummy-video" playsinline muted loop style="position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; top: -10px; left: -10px;"></video>
+
+  <!-- PWA 서비스 워커 등록 및 시계 구동 스크립트 -->
+  <script src="app.js"></script>
+</body>
+</html>
