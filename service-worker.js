@@ -1,5 +1,5 @@
 var params = new URLSearchParams(self.location.search);
-var APP_VERSION = params.get('v') || 'v0.2.13';
+var APP_VERSION = params.get('v') || 'v0.2.14';
 var CACHE_NAME = 'clock-cache-' + APP_VERSION;
 var ASSETS = [
   './',
